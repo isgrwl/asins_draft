@@ -13,7 +13,7 @@ import time
 import json
 from multiprocessing import Queue, Pool, Process, Manager, TimeoutError
 from seleniumbase import SB
-from amazon_scraper import amazon_scraper
+from scrape_page import scrape_page, DataRule
 
 # temp
 sample_urls = [
@@ -33,12 +33,20 @@ sample_urls = [
     "https://www.amazon.ca/Hisense-55A68N-Vision-Google-Bluetooth/dp/B0CW2FV2KJ/ref=sr_1_9?crid=2OVALZ4B5I94I&dib=eyJ2IjoiMSJ9.EQrLpMIzDo7MLJlmVSlTpAWZcBViSRMdeyX790ICqNwoHQ8R2YSlv5tIY342VcKZRaZ9_JCKqcjuoMiQP8X5HJE38epZY7xzXgnuLX5eyx4Zk5_Rs24kJtm9Il-4KGDa5vD0ZcaDjh3AZEpjlAYzTHO1aEq3yJdBjAAs9PGAWU1CSLYvIcTVEV4k06KsxwJikAMAj2OWMxC1hJdUzxF0SfUyBEgjyMg9qhU95NVa7JZnzo5kQ3_0i5GGeLpeC81vZPeWbBuXdAFF50K3eEOsZZtluwoo-52m_33xDX5zVd0.3apLH-mhgLiE5JqdoreI_5avgZ3jnwpHrAcqz7XKP3U&dib_tag=se&keywords=television&qid=1745793984&sprefix=television%2Caps%2C98&sr=8-9",
 ]
 
+rules = [
+    DataRule("title", '#productTitle'),
+    DataRule("price", '#corePriceDisplay_desktop_feature_div .aok-offscreen'),
+    DataRule("stars", '#acrPopover .a-icon-alt'),
+    DataRule("bought_past_month",
+             '#social-proofing-faceout-title-tk_bought')
+]
+
 
 def main():
     # defaults (should replace with cmdline args)
     OUTFILE = "data.json"
     NUM_INSTANCES = 3
-    TYPE = amazon_scraper
+    TYPE = scrape_page
 
     # initialization
     manager = Manager()
@@ -54,7 +62,7 @@ def main():
     # spawn multiple scraper instances
     for instance_num in range(NUM_INSTANCES):
         instance = Process(
-            target=scraper_instance,
+            target=run_scraper,
             args=(urls, results, instance_num+1, TYPE)
         )
         instance.start()
@@ -74,7 +82,7 @@ def main():
 
 
 # initialize scraper and begin processing URLs with getData callback
-def scraper_instance(urls, results, instance_num, getData=None,):
+def run_scraper(urls, results, instance_num, getData=None,):
     with SB(
         uc=True,
         xvfb=False,
@@ -91,7 +99,7 @@ def scraper_instance(urls, results, instance_num, getData=None,):
             try:
                 url = urls.get(True, 3)  # get url from queue
                 page = sb.cdp.get(url)  # navigate to url
-                data = getData(sb)  # run callback with browser context
+                data = getData(sb,rules)  # run callback with browser context
                 results[url] = data  # store result
 
             except Exception as error:
