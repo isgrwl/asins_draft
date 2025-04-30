@@ -17,6 +17,7 @@ Jinja2==3.1.6
 markdown-it-py==3.0.0
 MarkupSafe==3.0.2
 mdurl==0.1.2
+MouseInfo==0.1.3
 mycdp==1.2.0
 outcome==1.3.0.post0
 packaging==25.0
@@ -26,9 +27,15 @@ parse_type==0.6.4
 pdbp==1.7.0
 platformdirs==4.3.7
 pluggy==1.5.0
+PyAutoGUI==0.9.54
+PyGetWindow==0.0.9
 Pygments==2.19.1
+PyMsgBox==1.0.9
 pynose==1.5.4
 pyotp==2.9.0
+pyperclip==1.9.0
+PyRect==0.2.0
+PyScreeze==1.0.1
 PySocks==1.7.1
 pytest==8.3.5
 pytest-html==4.0.2
@@ -37,6 +44,8 @@ pytest-ordering==0.6
 pytest-rerunfailures==15.0
 pytest-xdist==3.6.1
 python-xlib==0.33
+python3-xlib==0.15
+pytweening==1.2.0
 PyYAML==6.0.2
 requests==2.32.3
 rich==14.0.0
